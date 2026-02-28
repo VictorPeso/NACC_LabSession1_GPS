@@ -14,7 +14,7 @@
 % io = orbit incliination [rad] 
 % long = current sub-satellite long [deg] 
 % lat = current sub-satellite lat [deg] 
-function [long, lat] = subsatellite(Oe, G, Me, a, Mo, dt, e, tol, w, Oo, dO, io) 
+function [lat, long] = subsatellite(Oe, G, Me, a, Mo, dt, e, tol, w, Oo, dO, io) 
     
     % ===== STEP 8 ==== 
     
@@ -25,8 +25,8 @@ function [long, lat] = subsatellite(Oe, G, Me, a, Mo, dt, e, tol, w, Oo, dO, io)
     ecef = satecef(Oe, Oo, dO, dt, io, xp, yp);
 
     lla = ecef2lla(ecef);
-    long = lla(1);  % Longitude from LLA
-    lat = lla(2);   % Latitude from LLA
+    lat = lla(1);  % Longitude from LLA
+    long = lla(2);   % Latitude from LLA
 
     if ismember("fd", who("global")) 
         global fd; 

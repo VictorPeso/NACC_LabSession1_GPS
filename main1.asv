@@ -92,7 +92,7 @@ for k = 1:N
     % Asegura longitudes en [-180, 180] por si tu función devuelve fuera del rango
     long = mod(long + 180, 360) - 180;
     
-    %fprintf('%d --> LAT: %d     LONG: %d\n',k,lat,long);
+    sprintf('%d --> LAT: %d     LONG: %',name,age);
 
     plot(long, lat, 'b.');
 end

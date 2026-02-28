@@ -18,21 +18,27 @@ function E = eccentric(e, tol, M)
         error('eccentric: tol debe ser positiva.');
     end
 
-    converged = 0;
-    E = M;
+    E0 = M;
+    E1 = M + e*sin(E0);
 
-    while converged == 0
-        f  = E - e*sin(E) - M;      % f(E)=0
-        fp = 1 - e*cos(E);          % f'(E)
+    while abs(E1-E0) > tol
 
-        dE = -f / fp;
-        E = E + dE;  % Update E with the correction
+        E0 = E1;
+        E1 = M + e*sin(E0);
 
-        if abs(dE) < tol % Check for convergence
-            converged = 1;
-        end
+        % f  = E - e*sin(E) - M;      % f(E)=0
+        % fp = 1 - e*cos(E);          % f'(E)
+        % 
+        % dE = -f / fp;
+        % E = E + dE;  % Update E with the correction
+        % 
+        % if abs(dE) < tol % Check for convergence
+        %     converged = 1;
+        % end
 
     end
+
+    E = E1;
 
     if ismember("fd", who("global")) 
         global fd; 
