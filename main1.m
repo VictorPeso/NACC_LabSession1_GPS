@@ -40,7 +40,7 @@ Lo = -0.1029058803E+001;      % longitude of AN at week epoch [rad] (uncorrected
 w = 2.065742194;              % argument of perigee [rad] 
 Mo = 0.2087359114E+001;       % Mean Anomaly at ToA [rad] 
 
-% ===== your code goes here ====
+% ===== STEP 1 ====
 
 t_target = 388818;
 dt = t_target - toa;
@@ -49,14 +49,40 @@ Oo = Lo - Oe*toa;
 
 fprintf(fd, "Oo = %f, esec = %f, dt = %f\n\n", mod(Oo, 2 * pi), esec, dt); 
 
-% ===== your code goes here ==== 
-% Calculate the mean motion (n) and the eccentric anomaly (E)
-% n = sqrt(G * Me / a^3);  % Mean motion (rad/s)
-% E = Mo + e * sin(Mo);    % Initial approximation of eccentric anomaly
+% ===== STEP 7 ====
+
+% M = mean_anomaly(G, Me, a, Mo, dt);
+% E = eccentric(e, tol, M);
+% v = true_anomaly(e, E);
+% [xp, yp] = orbitcoords(v, w, a, e, E);
+% ecef = satecef(Oe, Oo, dO, dt, io, xp, yp);
 % 
-% plot(long, lat, 'r*') 
-% text(long + 2, lat + 1, sprintf('%d', id)); 
-% 
-% % ===== your code goes here ==== 
-% 
-% fclose(fd);
+% lla = ecef2lla(ecef);
+% long = lla(1);  % Longitude from LLA
+% lat = lla(2);   % Latitude from LLA
+
+[long, lat] = subsatellite(Oe, G, Me, a, Mo, dt, e, tol, w, Oo, dO, io);
+
+plot(long, lat, 'r*') 
+text(long + 2, lat + 1, sprintf('%d', id)); 
+
+% ===== STEP 9 ==== 
+
+ddt = 0;
+count = 0;
+final_line = [];
+
+
+while ddt < toa
+
+    [long, lat] = subsatellite(Oe, G, Me, a, Mo, ddt, e, tol, w, Oo, dO, io);
+    final_line = [final_line; [long, lat]];
+    
+    
+    count = count + 1;
+    ddt = ddt + 5*60;
+end
+
+plot(final_line, 'b:');
+
+fclose(fd);

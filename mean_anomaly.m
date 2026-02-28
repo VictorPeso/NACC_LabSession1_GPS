@@ -6,8 +6,10 @@
 % Mo = Mean Anomaly at ToA [rad] 
 % dt = seconds elapsed after ToA (negative if ToA is in the future) 
 % M = Mean Anomaly at ToA + dt [rad] 
-function M = mean_anomaly(G, Me, a, Mo, dt) 
- % ===== your code goes here ====
+function M = mean_anomaly(G, Me, a, Mo, dt)
+
+ % ===== STEP 2 ====
+
     % Earth gravitational parameter
     mu = G * Me; % [m^3/s^2]
 
