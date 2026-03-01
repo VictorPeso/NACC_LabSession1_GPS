@@ -74,29 +74,39 @@ text(long + 2, lat + 1, sprintf('%d', id));
 
 % ===== STEP 9 ==== 
 
-mu = G*Me;                 % parametro gravitatorio
-T  = 2*pi*sqrt(a^3/mu);    % periodo orbital (s) ~ 43082 para GPS
-step_min = 5;              % 5 min = 300 s
+% mu = G*Me;                 % parametro gravitatorio
+% T  = 2*pi*sqrt(a^3/mu);    % periodo orbital (s) ~ 43082 para GPS
+% step_min = 5;              % 5 min = 300 s
+% step = step_min*60;
+% 
+% % Para groundtrack "completo" (patrón repetible): 2 órbitas ~ 1 día sideral
+% N = ceil((2*T)/step);      % ~289
+% 
+% dt0 = dt;                  % guarda el dt inicial
+
+week_sec = 24*60*60*7;
+step_min = 5;
 step = step_min*60;
+N = week_sec/step; % aprox 2016
 
-% Para groundtrack "completo" (patrón repetible): 2 órbitas ~ 1 día sideral
-N = ceil((2*T)/step);      % ~289
-
-dt0 = dt;                  % guarda el dt inicial
+vec = zeros(N, 2);
 
 for k = 1:N
-    dt = dt0 + (k-1)*step;
+
+    dt = (k-1)*step - toa;
 
     [lat, long] = subsatellite(Oe, G, Me, a, Mo, dt, e, tol, w, Oo, dO, io);
 
     % Asegura longitudes en [-180, 180] por si tu función devuelve fuera del rango
     long = mod(long + 180, 360) - 180;
-    
-    %fprintf('%d --> LAT: %d     LONG: %d\n',k,lat,long);
 
-    plot(long, lat, 'b.');
+    % fprintf('%d --> LAT: %d     LONG: %d\n',k,lat,long);
+
+    vec(k, 1) = long;
+    vec(k, 2) = lat;
 end
 
+plot(vec(:, 1), vec(:, 2), 'b.');
 
 % ddt = 0;
 % count = 0;
