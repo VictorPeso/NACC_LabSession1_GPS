@@ -91,13 +91,18 @@ N = week_sec/step; % aprox 2016
 
 vec = zeros(N, 2);
 
+t0 = t_target;
+
 for k = 1:N
 
-    dt = (k-1)*step - toa;
+    % dt = (k-1)*step - toa;
+    t = t0 + (k-1)*step;   % actual GPS time
+    dt = t - toa;          % time since almanac epoch
+
 
     [lat, long] = subsatellite(Oe, G, Me, a, Mo, dt, e, tol, w, Oo, dO, io);
 
-    % Asegura longitudes en [-180, 180] por si tu función devuelve fuera del rango
+    % Asegura longitudes en [-180, 180] por si esta fuera del rango
     long = mod(long + 180, 360) - 180;
 
     % fprintf('%d --> LAT: %d     LONG: %d\n',k,lat,long);
