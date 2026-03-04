@@ -43,6 +43,7 @@ Mo = 0.2087359114E+001;       % Mean Anomaly at ToA [rad]
 % ===== STEP 1 ====
 
 t_target = 388818;
+
 dt = t_target - toa;
 
 Oo = Lo - Oe*toa;
@@ -52,20 +53,14 @@ fprintf(fd, "Oo = %f, esec = %f, dt = %f\n\n", mod(Oo, 2 * pi), esec, dt);
 % ===== STEP 7 ====
 
 % M = mean_anomaly(G, Me, a, Mo, dt)
-% E = eccentric(e, tol, M);
-% 
-% M_prueba = E-e*sin(E)
-
-% M_prueba2 = mod(M,2*pi)
-
-% v = true_anomaly(e, E);
-% [xp, yp] = orbitcoords(v, w, a, e, E);
-% ecef = satecef(Oe, Oo, dO, dt, io, xp, yp);
-% 
+% E = eccentric(e, tol, M)
+% v = true_anomaly(e, E)
+% [xp, yp] = orbitcoords(v, w, a, e, E)
+% ecef = satecef(Oe, Oo, dO, dt, io, xp, yp)
 % lla = ecef2lla(ecef);
-% long = lla(1);  % Longitude from LLA
-% lat = lla(2);   % Latitude from LLA
-% 
+% long = lla(1)  % Longitude from LLA
+% lat = lla(2)   % Latitude from LLA
+
 [lat, long] = subsatellite(Oe, G, Me, a, Mo, dt, e, tol, w, Oo, dO, io);
 
 hold on;
@@ -74,20 +69,13 @@ text(long + 2, lat + 1, sprintf('%d', id));
 
 % ===== STEP 9 ==== 
 
-% mu = G*Me;                 % parametro gravitatorio
-% T  = 2*pi*sqrt(a^3/mu);    % periodo orbital (s) ~ 43082 para GPS
-% step_min = 5;              % 5 min = 300 s
-% step = step_min*60;
-% 
-% % Para groundtrack "completo" (patrón repetible): 2 órbitas ~ 1 día sideral
-% N = ceil((2*T)/step);      % ~289
-% 
-% dt0 = dt;                  % guarda el dt inicial
-
-week_sec = 24*60*60*7;
-step_min = 5;
+mu = G*Me;                 % parametro gravitatorio
+T  = 2*pi*sqrt(a^3/mu);    % periodo orbital (s) ~ 43082 para GPS
+step_min = 5;              % 5 min = 300 s
 step = step_min*60;
-N = week_sec/step; % aprox 2016
+
+% Para groundtrack "completo" (patrón repetible): 2 órbitas ~ 1 día sideral
+N = ceil((2*T)/step);      % ~289
 
 vec = zeros(N, 2);
 
@@ -95,39 +83,18 @@ t0 = t_target;
 
 for k = 1:N
 
-    % dt = (k-1)*step - toa;
     t = t0 + (k-1)*step;   % actual GPS time
     dt = t - toa;          % time since almanac epoch
-
 
     [lat, long] = subsatellite(Oe, G, Me, a, Mo, dt, e, tol, w, Oo, dO, io);
 
     % Asegura longitudes en [-180, 180] por si esta fuera del rango
     long = mod(long + 180, 360) - 180;
 
-    % fprintf('%d --> LAT: %d     LONG: %d\n',k,lat,long);
-
     vec(k, 1) = long;
     vec(k, 2) = lat;
 end
 
 plot(vec(:, 1), vec(:, 2), 'b.');
-
-% ddt = 0;
-% count = 0;
-% final_line = [];
-% 
-% 
-% while ddt < toa
-% 
-%     [lat, long] = subsatellite(Oe, G, Me, a, Mo, ddt, e, tol, w, Oo, dO, io);
-%     final_line = [final_line; [long, lat]];
-% 
-% 
-%     count = count + 1;
-%     ddt = ddt + 5*60;
-% end
-% 
-% plot(final_line, 'b:');
 
 fclose(fd);
